@@ -6,9 +6,9 @@ namespace Misterword
     static class Aide
     {
         public const string Texte =
-@"MISTERWORD, VERSION 4.0
+@"MISTERWORD, VERSION 4.1
 
-Trois jeux au clavier, pour NVDA et JAWS : Misterword, le jeu de mots dans le style de Motus, Mistermind, le jeu des couleurs, et le Taquin, le jeu des lettres à remettre dans l'ordre.
+Cinq jeux au clavier, pour NVDA et JAWS : Misterword, le jeu de mots dans le style de Motus, Mistermind, le jeu des couleurs, le Taquin, le jeu des lettres à remettre dans l'ordre, les Mots croisés et le Sudoku.
 Tout ce que le jeu annonce passe par votre lecteur d'écran, avec votre voix habituelle. Sans lecteur d'écran, la voix de Windows prend le relais.
 Appuyez sur Échap pour fermer cette aide.
 
@@ -16,7 +16,7 @@ LE MENU
 
 À l'ouverture, le jeu affiche une page vide. Alt ou F10 ouvre le menu.
 Menu Fichier :
-- Nouvelle partie : Misterword, avec la longueur du mot (5 à 10 lettres, ou au hasard), Mistermind, facile (4 couleurs sur 6) ou expert (5 couleurs sur 8), ou Taquin, facile (3 sur 3), normal (4 sur 4) ou expert (5 sur 5).
+- Nouvelle partie : Misterword, avec la longueur du mot (5 à 10 lettres, ou au hasard), Mistermind, facile (4 couleurs sur 6) ou expert (5 couleurs sur 8), Taquin, facile (3 sur 3), normal (4 sur 4) ou expert (5 sur 5), Mots croisés, facile (5 sur 5), moyen (7 sur 7), difficile (9 sur 9) ou expert (11 sur 11), ou Sudoku, facile, moyen, difficile ou expert.
 - Rejouer au même jeu : Ctrl+N.
 - Sauvegarder la partie : Ctrl+S. Reprendre la partie sauvegardée : Ctrl+O.
   En quittant pendant une partie, le jeu propose de la sauvegarder. Au lancement suivant, il propose de la reprendre. Une seule partie est gardée à la fois : la dernière sauvegardée.
@@ -82,17 +82,46 @@ Début et Fin : première et dernière colonne. Page précédente et Page suivan
 F3 : nombre de déplacements, temps écoulé et record.
 Le chronomètre démarre au premier déplacement. Quand le tableau est rangé, le jeu vous propose d'enregistrer votre temps, et annonce s'il s'agit d'un nouveau record. Chaque niveau a son propre record.
 
+MOTS CROISÉS
+
+Le jeu fabrique une grille nouvelle à chaque partie, avec des mots qui se croisent. Quatre tailles : facile 5 sur 5 (environ 6 mots), moyen 7 sur 7 (10 mots), difficile 9 sur 9 (15 mots), expert 11 sur 11 (une vingtaine de mots).
+Les mots et leurs définitions viennent du dictionnaire de la langue choisie dans le menu Langue, Langue des mots. Les accents ne comptent pas : tapez E pour É. En espagnol, Ñ est une lettre à part.
+Les cases sont nommées par une lettre pour la ligne et un chiffre pour la colonne : A1 est en haut à gauche, B3 est à la deuxième ligne, troisième colonne.
+Flèches : se déplacer d'une case. Le jeu annonce la case, sa lettre ou « vide », et le numéro du mot quand vous changez de mot. Une case noire est signalée.
+Tapez une lettre pour remplir la case : le curseur avance tout seul dans le sens du mot. « Mot complet » est annoncé quand toutes ses cases sont remplies.
+Entrée : lire la définition du mot où vous êtes, avec son numéro, son sens, sa longueur et les lettres déjà placées.
+Espace : changer de sens (horizontal ou vertical) quand la case appartient à deux mots, et lire la définition.
+Début et Fin : première et dernière lettre du mot. Retour arrière : effacer la lettre précédente. Suppr : effacer la case.
+Ctrl+L : épeler les lettres du mot. Ctrl+E : vérifier le mot, un bip par lettre (aigu juste, grave fausse, moyen vide). Ctrl+G : vérifier toute la grille. Ctrl+I : indice, révèle une lettre.
+Tab : passer à la liste des définitions, et revenir à la grille. Dans la liste, flèches haut et bas pour parcourir les définitions, flèches gauche et droite pour entendre les lettres déjà placées, Entrée pour aller au mot dans la grille.
+F3 : mots trouvés, cases remplies et temps écoulé. Ctrl+R : abandonner, la solution est remplie dans la grille.
+Quand la grille est juste, le jeu annonce votre temps et propose de l'enregistrer s'il n'y a eu aucun indice. Chaque taille a son record.
+
+SUDOKU
+
+Une grille de 9 sur 9, divisée en 9 blocs de 3 sur 3. Remplissez-la avec les chiffres de 1 à 9, sans répéter un chiffre dans une ligne, une colonne ou un bloc. Chaque grille a une solution unique.
+Quatre niveaux : facile, moyen, difficile et expert. Plus le niveau monte, moins il y a de chiffres donnés au départ.
+Flèches : se déplacer. Le jeu annonce le chiffre, « vide » ou « donné » pour les chiffres de départ, qui ne peuvent pas être changés, et le bloc quand vous en changez.
+Chiffres de 1 à 9, sur la rangée du haut ou le pavé numérique : placer un chiffre. S'il est déjà dans la ligne, la colonne ou le bloc, un bip d'erreur vous le signale.
+Retour arrière, Suppr ou 0 : effacer.
+L : lire la ligne. C : lire la colonne. B : lire le bloc. P : chiffres encore possibles dans la case. Espace : relire la case.
+Début et Fin : première et dernière colonne. Page précédente et Page suivante : première et dernière ligne.
+Ctrl+E : vérifier la grille. Ctrl+I : indice, place le bon chiffre dans la case.
+F3 : cases vides et temps écoulé. Ctrl+R : abandonner, la solution est remplie dans la grille.
+Le temps peut être enregistré à la fin s'il n'y a eu aucun indice. Chaque niveau a son record.
+
 PERSONNALISER
 
-Les dictionnaires se téléchargent séparément, un par langue, sur la page du jeu. Décompressez-les dans le dossier du jeu : ils se rangent dans le dossier dictionnaires, sous-dossier fr, en ou es.
-Chaque dictionnaire contient mots.txt, la liste des mots acceptés, un mot par ligne, en majuscules sans accent, et mots_secrets.txt, les mots à deviner. Vous pouvez les modifier.
-Le Mistermind et le Taquin fonctionnent sans dictionnaire.
+Les dictionnaires, un par langue, se téléchargent depuis le jeu : menu Langue, Télécharger un dictionnaire. Le jeu le propose aussi tout seul quand un dictionnaire manque. Il faut une connexion à Internet.
+Vous pouvez aussi les télécharger sur la page du jeu et les décompresser dans le dossier du jeu : ils se rangent dans le dossier dictionnaires, sous-dossier fr, en ou es.
+Chaque dictionnaire contient mots.txt, la liste des mots acceptés, un mot par ligne, en majuscules sans accent, mots_secrets.txt, les mots à deviner, et definitions.txt, les définitions des mots croisés, une par ligne sous la forme MOT|définition. Vous pouvez les modifier.
+Le Mistermind, le Taquin et le Sudoku fonctionnent sans dictionnaire.
 Vos statistiques et vos options sont dans le dossier AppData\Roaming\Misterword.";
 
         public const string TexteEn =
-@"MISTERWORD, VERSION 4.0
+@"MISTERWORD, VERSION 4.1
 
-Three keyboard games for NVDA and JAWS: Misterword, a word game in the style of Lingo, Mistermind, the colour game, and the slide puzzle, where letters must be put back in order.
+Five keyboard games for NVDA and JAWS: Misterword, a word game in the style of Lingo, Mistermind, the colour game, the slide puzzle, where letters must be put back in order, the Crossword and Sudoku.
 Everything the game says goes through your screen reader, with your usual voice. Without a screen reader, the Windows voice takes over.
 Press Escape to close this help.
 
@@ -100,7 +129,7 @@ THE MENU
 
 When it opens, the game shows an empty page. Alt or F10 opens the menu.
 File menu:
-- New game: Misterword, with the length of the word (5 to 10 letters, or random), Mistermind, easy (4 colours out of 6) or expert (5 colours out of 8), or Slide puzzle, easy (3 by 3), normal (4 by 4) or expert (5 by 5).
+- New game: Misterword, with the length of the word (5 to 10 letters, or random), Mistermind, easy (4 colours out of 6) or expert (5 colours out of 8), Slide puzzle, easy (3 by 3), normal (4 by 4) or expert (5 by 5), Crossword, easy (5 by 5), medium (7 by 7), hard (9 by 9) or expert (11 by 11), or Sudoku, easy, medium, hard or expert.
 - Play the same game again: Ctrl+N.
 - Save the game: Ctrl+S. Resume the saved game: Ctrl+O.
   If you quit during a game, you are offered to save it. Next time you start, you are offered to resume it. Only one game is kept at a time: the last one saved.
@@ -166,17 +195,46 @@ Home and End: first and last column. Page Up and Page Down: first and last row.
 F3: number of moves, time elapsed and record.
 The timer starts with the first move. When the board is solved, the game offers to record your time and tells you if it is a new record. Each level has its own record.
 
+CROSSWORD
+
+The game builds a new grid for each game, with interlocking words. Four sizes: easy 5 by 5 (about 6 words), medium 7 by 7 (10 words), hard 9 by 9 (15 words), expert 11 by 11 (about twenty words).
+The words and their clues come from the dictionary of the language chosen in the Language menu, Word language. Accents do not count: type E for É. In Spanish, Ñ is a letter of its own.
+Squares are named by a letter for the row and a number for the column: A1 is top left, B3 is on the second row, third column.
+Arrows: move one square. The game announces the square, its letter or empty, and the word number when you move to another word. A black square is signalled.
+Type a letter to fill the square: the cursor moves on by itself along the word. Word complete is announced when all its squares are filled.
+Enter: read the clue of the word you are on, with its number, direction, length and the letters already placed.
+Space: switch direction (across or down) when the square belongs to two words, and read the clue.
+Home and End: first and last letter of the word. Backspace: erase the previous letter. Delete: erase the square.
+Ctrl+L: spell the letters of the word. Ctrl+E: check the word, one beep per letter (high correct, low wrong, middle empty). Ctrl+G: check the whole grid. Ctrl+I: hint, reveals a letter.
+Tab: go to the list of clues, and back to the grid. In the list, Up and Down arrows browse the clues, Left and Right arrows say the letters already placed, Enter goes to the word in the grid.
+F3: words solved, squares filled and time elapsed. Ctrl+R: give up, the solution is filled into the grid.
+When the grid is correct, the game announces your time and offers to record it if no hint was used. Each size has its own record.
+
+SUDOKU
+
+A 9 by 9 grid, divided into 9 boxes of 3 by 3. Fill it with the digits 1 to 9, without repeating a digit in a row, a column or a box. Each grid has a single solution.
+Four levels: easy, medium, hard and expert. The higher the level, the fewer digits are given at the start.
+Arrows: move. The game announces the digit, empty, or given for the starting digits, which cannot be changed, and the box when you move to another one.
+Digits 1 to 9, on the top row or the numeric keypad: place a digit. If it is already in the row, column or box, an error beep tells you.
+Backspace, Delete or 0: erase.
+L: read the row. C: read the column. B: read the box. P: digits still possible in the square. Space: read the square again.
+Home and End: first and last column. Page Up and Page Down: first and last row.
+Ctrl+E: check the grid. Ctrl+I: hint, places the right digit in the square.
+F3: empty squares and time elapsed. Ctrl+R: give up, the solution is filled into the grid.
+Your time can be recorded at the end if no hint was used. Each level has its own record.
+
 CUSTOMISING
 
-Dictionaries are downloaded separately, one per language, from the game page. Unzip them into the game folder: they go into the dictionnaires folder, in the fr, en or es subfolder.
-Each dictionary contains mots.txt, the list of accepted words, one per line, in capitals without accents, and mots_secrets.txt, the words to guess. You can edit them.
-Mistermind and the slide puzzle work without a dictionary.
+Dictionaries, one per language, can be downloaded from the game: Language menu, Download a dictionary. The game also offers it by itself when a dictionary is missing. An Internet connection is needed.
+You can also download them from the game page and unzip them into the game folder: they go into the dictionnaires folder, in the fr, en or es subfolder.
+Each dictionary contains mots.txt, the list of accepted words, one per line, in capitals without accents, mots_secrets.txt, the words to guess, and definitions.txt, the crossword clues, one per line in the form WORD|clue. You can edit them.
+Mistermind, the slide puzzle and Sudoku work without a dictionary.
 Your statistics and options are in the AppData\Roaming\Misterword folder.";
 
         public const string TexteEs =
-@"MISTERWORD, VERSIÓN 4.0
+@"MISTERWORD, VERSIÓN 4.1
 
-Tres juegos con el teclado para NVDA y JAWS: Misterword, un juego de palabras al estilo de Lingo, Mistermind, el juego de los colores, y el puzle deslizante, en el que hay que poner las letras en orden.
+Cinco juegos con el teclado para NVDA y JAWS: Misterword, un juego de palabras al estilo de Lingo, Mistermind, el juego de los colores, el puzle deslizante, en el que hay que poner las letras en orden, el Crucigrama y el Sudoku.
 Todo lo que dice el juego pasa por su lector de pantalla, con su voz habitual. Sin lector de pantalla, toma el relevo la voz de Windows.
 Pulse Escape para cerrar esta ayuda.
 
@@ -184,7 +242,7 @@ EL MENÚ
 
 Al abrirse, el juego muestra una página vacía. Alt o F10 abre el menú.
 Menú Archivo:
-- Nueva partida: Misterword, con la longitud de la palabra (de 5 a 10 letras, o al azar), Mistermind, fácil (4 colores de 6) o experto (5 colores de 8), o Puzle deslizante, fácil (3 por 3), normal (4 por 4) o experto (5 por 5).
+- Nueva partida: Misterword, con la longitud de la palabra (de 5 a 10 letras, o al azar), Mistermind, fácil (4 colores de 6) o experto (5 colores de 8), Puzle deslizante, fácil (3 por 3), normal (4 por 4) o experto (5 por 5), Crucigrama, fácil (5 por 5), medio (7 por 7), difícil (9 por 9) o experto (11 por 11), o Sudoku, fácil, medio, difícil o experto.
 - Volver a jugar al mismo juego: Ctrl+N.
 - Guardar la partida: Ctrl+S. Reanudar la partida guardada: Ctrl+O.
   Si sale durante una partida, el juego le propone guardarla. La próxima vez que lo abra, le propone reanudarla. Solo se conserva una partida: la última guardada.
@@ -250,11 +308,40 @@ Inicio y Fin: primera y última columna. Re Pág y Av Pág: primera y última fi
 F3: número de movimientos, tiempo transcurrido y récord.
 El cronómetro empieza con el primer movimiento. Cuando el tablero está ordenado, el juego le propone registrar su tiempo y le dice si es un nuevo récord. Cada nivel tiene su propio récord.
 
+CRUCIGRAMA
+
+El juego crea una cuadrícula nueva en cada partida, con palabras que se cruzan. Cuatro tamaños: fácil 5 por 5 (unas 6 palabras), medio 7 por 7 (10 palabras), difícil 9 por 9 (15 palabras), experto 11 por 11 (una veintena de palabras).
+Las palabras y sus definiciones vienen del diccionario del idioma elegido en el menú Idioma, Idioma de las palabras. Las tildes no cuentan: escriba E para É. La Ñ es una letra propia.
+Las casillas se nombran con una letra para la fila y un número para la columna: A1 está arriba a la izquierda, B3 está en la segunda fila, tercera columna.
+Flechas: moverse una casilla. El juego anuncia la casilla, su letra o vacía, y el número de la palabra cuando cambia de palabra. Se avisa de las casillas negras.
+Escriba una letra para llenar la casilla: el cursor avanza solo en el sentido de la palabra. Se anuncia Palabra completa cuando todas sus casillas están llenas.
+Intro: leer la definición de la palabra en la que está, con su número, sentido, longitud y las letras ya puestas.
+Espacio: cambiar de sentido (horizontal o vertical) cuando la casilla pertenece a dos palabras, y leer la definición.
+Inicio y Fin: primera y última letra de la palabra. Retroceso: borrar la letra anterior. Supr: borrar la casilla.
+Ctrl+L: deletrear la palabra. Ctrl+E: comprobar la palabra, un pitido por letra (agudo correcta, grave incorrecta, medio vacía). Ctrl+G: comprobar toda la cuadrícula. Ctrl+I: pista, revela una letra.
+Tab: pasar a la lista de definiciones, y volver a la cuadrícula. En la lista, flechas arriba y abajo para recorrer las definiciones, flechas izquierda y derecha para oír las letras ya puestas, Intro para ir a la palabra en la cuadrícula.
+F3: palabras resueltas, casillas llenas y tiempo transcurrido. Ctrl+R: abandonar, la solución aparece en la cuadrícula.
+Cuando la cuadrícula es correcta, el juego anuncia su tiempo y le propone registrarlo si no ha usado ninguna pista. Cada tamaño tiene su récord.
+
+SUDOKU
+
+Una cuadrícula de 9 por 9, dividida en 9 bloques de 3 por 3. Llénela con las cifras del 1 al 9, sin repetir una cifra en una fila, una columna o un bloque. Cada cuadrícula tiene una única solución.
+Cuatro niveles: fácil, medio, difícil y experto. Cuanto más alto el nivel, menos cifras se dan al principio.
+Flechas: moverse. El juego anuncia la cifra, vacía, o dada para las cifras iniciales, que no se pueden cambiar, y el bloque cuando cambia de bloque.
+Cifras del 1 al 9, en la fila superior o el teclado numérico: poner una cifra. Si ya está en la fila, la columna o el bloque, un pitido de error le avisa.
+Retroceso, Supr o 0: borrar.
+L: leer la fila. C: leer la columna. B: leer el bloque. P: cifras aún posibles en la casilla. Espacio: volver a leer la casilla.
+Inicio y Fin: primera y última columna. Re Pág y Av Pág: primera y última fila.
+Ctrl+E: comprobar la cuadrícula. Ctrl+I: pista, pone la cifra correcta en la casilla.
+F3: casillas vacías y tiempo transcurrido. Ctrl+R: abandonar, la solución aparece en la cuadrícula.
+Su tiempo se puede registrar al final si no ha usado ninguna pista. Cada nivel tiene su récord.
+
 PERSONALIZAR
 
-Los diccionarios se descargan por separado, uno por idioma, en la página del juego. Descomprímalos en la carpeta del juego: se colocan en la carpeta dictionnaires, subcarpeta fr, en o es.
-Cada diccionario contiene mots.txt, la lista de palabras aceptadas, una por línea, en mayúsculas sin tildes, y mots_secrets.txt, las palabras que hay que adivinar. Puede modificarlos.
-El Mistermind y el puzle deslizante funcionan sin diccionario.
+Los diccionarios, uno por idioma, se descargan desde el juego: menú Idioma, Descargar un diccionario. El juego también lo propone solo cuando falta un diccionario. Se necesita conexión a Internet.
+También puede descargarlos en la página del juego y descomprimirlos en la carpeta del juego: se colocan en la carpeta dictionnaires, subcarpeta fr, en o es.
+Cada diccionario contiene mots.txt, la lista de palabras aceptadas, una por línea, en mayúsculas sin tildes, mots_secrets.txt, las palabras que hay que adivinar, y definitions.txt, las definiciones del crucigrama, una por línea con la forma PALABRA|definición. Puede modificarlos.
+El Mistermind, el puzle deslizante y el Sudoku funcionan sin diccionario.
 Sus estadísticas y opciones están en la carpeta AppData\Roaming\Misterword.";
 
         public static void Afficher(IWin32Window parent)

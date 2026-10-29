@@ -8,9 +8,9 @@ using System.Windows.Forms;
 
 namespace Misterword
 {
-    enum Jeu { Aucun, Mots, Couleurs, Taquin }
+    enum Jeu { Aucun, Mots, Couleurs, Taquin, MotsCroises, Sudoku }
 
-    class Fenetre : Form
+    partial class Fenetre : Form
     {
         readonly Random rnd = new Random();
         readonly string dossierJeu, dossierDonnees;
@@ -86,13 +86,18 @@ namespace Misterword
             ConstruirePage();
             ConstruireZoneJeu();
             ConstruireTaquin();
+            ConstruireGrilles();
             Controls.Add(zoneJeu);
             Controls.Add(panneauTaquin);
+            Controls.Add(panneauMC);
+            Controls.Add(panneauSudoku);
             Controls.Add(page);
             Controls.Add(menu);
             MainMenuStrip = menu;
             zoneJeu.Visible = false;
             panneauTaquin.Visible = false;
+            panneauMC.Visible = false;
+            panneauSudoku.Visible = false;
             records[3] = RecordsTaquin.Charger(Path.Combine(dossierDonnees, "taquin3.txt"));
             records[4] = RecordsTaquin.Charger(Path.Combine(dossierDonnees, "taquin.txt"));
             records[5] = RecordsTaquin.Charger(Path.Combine(dossierDonnees, "taquin5.txt"));
@@ -121,6 +126,18 @@ namespace Misterword
             taquin.DropDownItems.Add(Item(L.T("&Normal : 4 sur 4, lettres A à O"), Keys.None, () => NouveauTaquin(4)));
             taquin.DropDownItems.Add(Item(L.T("&Expert : 5 sur 5, lettres A à X"), Keys.None, () => NouveauTaquin(5)));
             nouvelle.DropDownItems.Add(taquin);
+            var mc = new ToolStripMenuItem(L.T("Mots &croisés"));
+            mc.DropDownItems.Add(Item(L.T("&Facile : grille de 5 sur 5"), Keys.None, () => NouveauxMotsCroises(5)));
+            mc.DropDownItems.Add(Item(L.T("&Moyen : grille de 7 sur 7"), Keys.None, () => NouveauxMotsCroises(7)));
+            mc.DropDownItems.Add(Item(L.T("&Difficile : grille de 9 sur 9"), Keys.None, () => NouveauxMotsCroises(9)));
+            mc.DropDownItems.Add(Item(L.T("&Expert : grille de 11 sur 11"), Keys.None, () => NouveauxMotsCroises(11)));
+            nouvelle.DropDownItems.Add(mc);
+            var su = new ToolStripMenuItem(L.T("&Sudoku"));
+            su.DropDownItems.Add(Item(L.T("&Facile"), Keys.None, () => NouveauSudoku(1)));
+            su.DropDownItems.Add(Item(L.T("&Moyen"), Keys.None, () => NouveauSudoku(2)));
+            su.DropDownItems.Add(Item(L.T("&Difficile"), Keys.None, () => NouveauSudoku(3)));
+            su.DropDownItems.Add(Item(L.T("&Expert"), Keys.None, () => NouveauSudoku(4)));
+            nouvelle.DropDownItems.Add(su);
             menuFichier.DropDownItems.Add(nouvelle);
             menuFichier.DropDownItems.Add(Item(L.T("&Rejouer au même jeu"), Keys.Control | Keys.N, Rejouer));
             menuFichier.DropDownItems.Add(Item(L.T("Sau&vegarder la partie"), Keys.Control | Keys.S, () => Sauvegarder(true)));
@@ -152,7 +169,7 @@ namespace Misterword
             inter.DropDownItems.Add(ItemCoche("&Français", L.Code == "fr", () => ChangerInterface("fr")));
             inter.DropDownItems.Add(ItemCoche("&English", L.Code == "en", () => ChangerInterface("en")));
             inter.DropDownItems.Add(ItemCoche("&Español", L.Code == "es", () => ChangerInterface("es")));
-            var mots2 = new ToolStripMenuItem(L.T("&Mots de Misterword"));
+            var mots2 = new ToolStripMenuItem(L.T("&Langue des mots (Misterword, mots croisés)"));
             foreach (var c in Langues)
             {
                 string cc = c;
@@ -160,8 +177,17 @@ namespace Misterword
                 if (!DicoInstalle(c)) nom += L.T(" (non installé)");
                 mots2.DropDownItems.Add(ItemCoche(nom, langueMots == c, () => ChangerMots(cc)));
             }
+            var tele = new ToolStripMenuItem(L.T("&Télécharger un dictionnaire"));
+            foreach (var c in Langues)
+            {
+                string cc = c;
+                string nom = c == "fr" ? L.T("&Français") : c == "en" ? L.T("&Anglais") : L.T("&Espagnol");
+                nom += DicoInstalle(c) ? L.T(" (installé, mettre à jour)") : L.T(" (non installé)");
+                tele.DropDownItems.Add(Item(nom, Keys.None, () => Telecharger(cc, null)));
+            }
             langue.DropDownItems.Add(inter);
             langue.DropDownItems.Add(mots2);
+            langue.DropDownItems.Add(tele);
 
             menu.Items.Add(menuFichier);
             menu.Items.Add(langue);
@@ -266,6 +292,11 @@ namespace Misterword
                 var r = MessageBox.Show(this, L.T("Une partie sauvegardée existe : ") + DecrireSauvegarde() + L.T(".\n\nVoulez-vous la reprendre ?"), L.T("Reprendre la partie"), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (r == DialogResult.Yes && Reprendre(false)) { PlusTardMaj(); return; }
             }
+            if (!Langues.Any(DicoInstalle))
+            {
+                string code = Langues.Contains(L.Code) ? L.Code : "fr";
+                ProposerTelechargement(code, L.T("Aucun dictionnaire n'est installé : Misterword et les mots croisés en ont besoin. Le Mistermind, le Taquin et le Sudoku restent jouables sans dictionnaire."), null);
+            }
             PlusTard(600, () => Parole.Dire(L.T("Misterword. Alt ou F10 pour ouvrir le menu, puis Nouvelle partie."), false));
             var t = new Timer { Interval = 6000 };
             t.Tick += (s, e2) => { t.Stop(); t.Dispose(); MajAuDemarrage(); };
@@ -334,6 +365,8 @@ namespace Misterword
         {
             string f = Path.Combine(DossierDico(code), "mots.txt");
             if (File.Exists(f)) return f;
+            f = Path.Combine(DossierDicoDonnees(code), "mots.txt");
+            if (File.Exists(f)) return f;
             f = ChercherDico(code);
             if (f != null) return f;
             if (code == "fr" && File.Exists(Path.Combine(dossierJeu, "mots.txt"))) return Path.Combine(dossierJeu, "mots.txt");   // ancienne installation
@@ -394,7 +427,7 @@ namespace Misterword
         {
             if (!DicoInstalle(code))
             {
-                Parole.Dire(L.F("Le dictionnaire {0} n'est pas installé. Téléchargez-le sur la page du jeu, puis décompressez-le dans le dossier du jeu.", NomLangue(code)));
+                ProposerTelechargement(code, L.F("Le dictionnaire {0} n'est pas installé.", NomLangue(code)), () => { if (DicoInstalle(code)) ChangerMots(code); });
                 return;
             }
             langueMots = code;
@@ -448,6 +481,8 @@ namespace Misterword
             if (jeu == Jeu.Aucun) page.Focus();
             else if (jeu == Jeu.Mots) saisieMot.Focus();
             else if (jeu == Jeu.Taquin) zoneTaquin.Focus();
+            else if (jeu == Jeu.MotsCroises) { if (!listeDefs.Focused) zoneMC.Focus(); }
+            else if (jeu == Jeu.Sudoku) zoneSudoku.Focus();
             else saisieCode.Focus();
         }
 
@@ -525,8 +560,10 @@ namespace Misterword
             jeu = j;
             finie = false; comptee = false; pos = -1;
             page.Visible = false;
-            zoneJeu.Visible = j != Jeu.Taquin;
+            zoneJeu.Visible = j == Jeu.Mots || j == Jeu.Couleurs;
             panneauTaquin.Visible = j == Jeu.Taquin;
+            panneauMC.Visible = j == Jeu.MotsCroises;
+            panneauSudoku.Visible = j == Jeu.Sudoku;
             saisieMot.Visible = j == Jeu.Mots;
             saisieCode.Visible = j == Jeu.Couleurs;
             liste.Items.Clear();
@@ -541,6 +578,8 @@ namespace Misterword
             if (jeu == Jeu.Mots) NouveauMot(longueurChoisie);
             else if (jeu == Jeu.Couleurs) NouveauCode(avanceChoisi);
             else if (jeu == Jeu.Taquin) NouveauTaquin(tailleTaquin);
+            else if (jeu == Jeu.MotsCroises) NouveauxMotsCroises(tailleMC);
+            else if (jeu == Jeu.Sudoku) NouveauSudoku(niveauSudoku);
             else Parole.Dire(L.T("Choisissez d'abord un jeu dans le menu Fichier, Nouvelle partie."));
         }
 
@@ -555,6 +594,7 @@ namespace Misterword
                 PlusTard(d0, () => Parole.Dire(L.T("Partie abandonnée, après ") + Depl(partieTaquin.Deplacements) + L.T(". Ctrl+N pour rejouer.")));
                 return;
             }
+            if (jeu == Jeu.MotsCroises || jeu == Jeu.Sudoku) { AbandonnerGrille(); return; }
             Compter(false);
             finie = true;
             string sol = jeu == Jeu.Mots ? L.T("Le mot était ") + partieMot.Secret : L.T("La combinaison était : ") + PartieCouleurs.Noms(partieCouleurs.Secret);
@@ -569,7 +609,7 @@ namespace Misterword
 
         void AnnoncerStatistiques()
         {
-            Parole.Dire(stats.Mots.Decrire("Misterword") + " " + stats.Couleurs.Decrire("Mistermind") + " " + DecrireRecordsTaquin());
+            Parole.Dire(stats.Mots.Decrire("Misterword") + " " + stats.Couleurs.Decrire("Mistermind") + " " + DecrireRecordsTaquin() + " " + DecrireRecordsGrilles());
         }
 
         void BasculerClair()
@@ -608,7 +648,7 @@ namespace Misterword
         void APropos()
         {
             MessageBox.Show(this,
-                L.T("Misterword, version 4.0\n\nMisterword, dans le style de Motus, Mistermind, le jeu des couleurs, et le Taquin.\nJouable entièrement au clavier, avec NVDA ou JAWS.\n\nDictionnaire : Grammalecte / Dicollecte (MPL 2.0) et « an-array-of-french-words » (MIT).\nCommunication avec NVDA : nvdaControllerClient, de NV Access (LGPL)."),
+                L.T("Misterword, version 4.1\n\nMisterword, dans le style de Motus, Mistermind, le jeu des couleurs, le Taquin, les Mots croisés et le Sudoku.\nJouable entièrement au clavier, avec NVDA ou JAWS.\n\nDictionnaire : Grammalecte / Dicollecte (MPL 2.0) et « an-array-of-french-words » (MIT).\nCommunication avec NVDA : nvdaControllerClient, de NV Access (LGPL).\n\nDéfinitions des mots croisés écrites pour le jeu. Publié par Exatropic, sans restriction de droits."),
                 L.T("À propos de Misterword"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -616,6 +656,8 @@ namespace Misterword
         {
             if (jeu == Jeu.Aucun) return L.T("Aucune partie. Alt ou F10 pour ouvrir le menu.");
             if (jeu == Jeu.Taquin) return RecapTaquin();
+            if (jeu == Jeu.MotsCroises) return RecapMC();
+            if (jeu == Jeu.Sudoku) return RecapSudoku();
             if (jeu == Jeu.Mots)
             {
                 if (finie) return L.T("Partie terminée. Le mot était ") + partieMot.Secret + L.T(". Ctrl+N pour rejouer.");
@@ -634,14 +676,14 @@ namespace Misterword
         void CompterSiAbandon()
         {
             // quitter une partie commencée pour une autre compte comme une partie perdue
-            if (jeu == Jeu.Aucun || jeu == Jeu.Taquin || finie || comptee) return;
+            if (jeu != Jeu.Mots && jeu != Jeu.Couleurs || finie || comptee) return;
             int n = jeu == Jeu.Mots ? (partieMot == null ? 0 : partieMot.Essais.Count) : (partieCouleurs == null ? 0 : partieCouleurs.Essais.Count);
             if (n > 0) Compter(false);
         }
 
         void Compter(bool gagne)
         {
-            if (comptee || jeu == Jeu.Taquin) return;
+            if (comptee || (jeu != Jeu.Mots && jeu != Jeu.Couleurs)) return;
             comptee = true;
             if (jeu == Jeu.Mots) stats.Mots.Enregistrer(gagne, partieMot.Essais.Count, gagne ? partieMot.Points() : 0);
             else stats.Couleurs.Enregistrer(gagne, partieCouleurs.Essais.Count, gagne ? partieCouleurs.Points() : 0);
@@ -763,6 +805,8 @@ namespace Misterword
             {
                 if (finie) return false;
                 if (jeu == Jeu.Taquin) return partieTaquin != null;
+                if (jeu == Jeu.MotsCroises) return partieMC != null && partieMC.CasesRemplies > 0;
+                if (jeu == Jeu.Sudoku) return partieSudoku != null;
                 if (jeu == Jeu.Mots) return partieMot != null && partieMot.Essais.Count > 0;
                 if (jeu == Jeu.Couleurs) return partieCouleurs != null && partieCouleurs.Essais.Count > 0;
                 return false;
@@ -795,6 +839,7 @@ namespace Misterword
                 l.Add("secret=" + Code(partieCouleurs.Secret));
                 l.Add("essais=" + string.Join(",", partieCouleurs.Essais.Select(Code)));
             }
+            else if (jeu == Jeu.MotsCroises || jeu == Jeu.Sudoku) SauverGrille(l);
             else
             {
                 l.Add("jeu=taquin");
@@ -840,6 +885,8 @@ namespace Misterword
                     case "mots": return L.T("Misterword, mot de ") + d["secret"].Length + L.T(" lettres");
                     case "couleurs": return L.T("Mistermind ") + (d["avance"] == "1" ? L.T("expert") : L.T("facile"));
                     case "taquin": return L.T("Taquin ") + NiveauTaquin(int.Parse(d["taille"]));
+                    case "motscroises": return L.T("Mots croisés ") + NiveauMC(int.Parse(d["taille"]));
+                    case "sudoku": return L.T("Sudoku ") + PartieSudoku.NomNiveau(int.Parse(d["niveau"]));
                 }
             }
             catch { }
@@ -887,6 +934,10 @@ namespace Misterword
                         }
                     case "taquin":
                         NouveauTaquin(Entier(d, "taille"), d["grille"].Replace('_', ' '), Entier(d, "deplacements"), Entier(d, "secondes"), Entier(d, "ligne"), Entier(d, "colonne"));
+                        break;
+                    case "motscroises":
+                    case "sudoku":
+                        ReprendreGrille(d["jeu"], d);
                         break;
                     default: throw new Exception("jeu inconnu");
                 }
@@ -1027,8 +1078,9 @@ namespace Misterword
         {
             if (dico == null)
             {
-                if (Langues.Any(DicoInstalle)) Parole.Dire(L.F("Le dictionnaire {0} n'est pas installé. Téléchargez-le sur la page du jeu, puis décompressez-le dans le dossier du jeu.", NomLangue(langueMots)));
-                else Parole.Dire(L.T("Aucun dictionnaire n'est installé. Téléchargez-en un sur la page du jeu, puis décompressez-le dans le dossier du jeu. Le Mistermind et le Taquin restent jouables."));
+                string code = Langues.Contains(langueMots) ? langueMots : L.Code;
+                ProposerTelechargement(code, Langues.Any(DicoInstalle) ? L.F("Le dictionnaire {0} n'est pas installé.", NomLangue(code))
+                    : L.T("Aucun dictionnaire n'est installé. Le Mistermind, le Taquin et le Sudoku restent jouables sans dictionnaire."), () => { if (dico != null) NouveauMot(longueur); });
                 return;
             }
             longueurChoisie = longueur;

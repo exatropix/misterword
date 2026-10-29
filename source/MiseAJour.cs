@@ -13,7 +13,7 @@ namespace Misterword
     public static class MiseAJour
     {
         public const string Depot = "exatropix/misterword";            // compte/dépôt sur GitHub
-        public const string VersionActuelle = "4.0";
+        public const string VersionActuelle = "4.1";
         public static string PageDepot { get { return "https://github.com/" + Depot + "/releases/latest"; } }
 
         public class Resultat
